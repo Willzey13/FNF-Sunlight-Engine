@@ -6,6 +6,9 @@ A Remake of a engine in which initially was going to be over FE (Forever Engine)
 </p>
 
 We appreciate you using our engine, we are happy!! :)
+![Sunlight Engine Logo](https://art.ngfiles.com/medium_views/5563000/5563765_619031_willzinhu_sunlightengine.7856f10b77a8e6aff49918f3dd8f0846.webp?f1711488491)
+
+The Sunlight Engine is an inspiring and positive evolution of the creative and engaging spirit of Friday Night Funkin'. Developed by Willzey and toffe.caramel, now lighter and optimized, this engine takes the gaming experience to new heights, offering players an even more vibrant and stimulating musical journey.
 
 # Idea
 The Sunlight Engine is a more optimized and positive version of the Psych Engine, while the Forever Engine is a distinct creation. Each of these engines contributes to the diversity of the game Friday Night Funkin', with the Sunlight Engine bringing a lighter and brighter atmosphere, in contrast to the Psych Engine, which offers a more challenging and distorted experience.
