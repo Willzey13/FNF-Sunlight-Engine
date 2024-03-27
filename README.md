@@ -25,11 +25,13 @@ haxelib install [library]
 ```
 wherever [library] is, change it to the next library you are installing!!
 ```
-lime
-flixel
-flixel-addons
-flixel-ui
-discord_rpc 
+lime 8.0.2
+flixel 5.6.0
+flixel-addons 3.2.1
+flixel-ui 2.5.0
+hxdiscord_rpc 1.1.1
+hxcpp-debug-server 1.2.4
+hscript
 ```
 
 ## Credits:
