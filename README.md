@@ -6,7 +6,7 @@ We appreciate you using our engine, we are happy!! :)
 
 The Sunlight Engine is an inspiring and positive evolution of the creative and engaging spirit of Friday Night Funkin'. Developed by Willzey and toffe.caramel, now lighter and optimized, this engine takes the gaming experience to new heights, offering players an even more vibrant and stimulating musical journey.
 
-# Idea
+## Idea
 The Sunlight Engine is a more optimized and positive version of the Psych Engine, while the Forever Engine is a distinct creation. Each of these engines contributes to the diversity of the game Friday Night Funkin', with the Sunlight Engine bringing a lighter and brighter atmosphere, in contrast to the Psych Engine, which offers a more challenging and distorted experience.
 
 ## Friday Night Funkin'
@@ -17,7 +17,7 @@ The Sunlight Engine is a more optimized and positive version of the Psych Engine
 
 The Sunlight Engine is an uplifting and inspiring evolution of the creative and engaging spirit of Friday Night Funkin'. With its radiant atmosphere and exciting gameplay, the Sunlight Engine takes the gaming experience to new heights, offering players an even more vibrant and stimulating musical journey. Compatible with mod creation without the need for programming in HaxeFlixel source, the Sunlight Engine empowers creators to explore endless possibilities for customization and innovation within the FNF universe, keeping the legacy and fun of the original game alive.
 
-### LIBRARIES
+# LIBRARIES!!
 The libraries were chosen by me and Toffe <3 :3
 Remembering to install these libraries use: 
 ```
@@ -32,7 +32,7 @@ flixel-ui
 discord_rpc 
 ```
 
-# Credits:
+## Credits:
 * Willzey - Owner/Programmer
 * Toffe - Owner/Programmer/Musician
 * Guisende - Programmer
