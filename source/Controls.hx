@@ -1,0 +1,170 @@
+package;
+
+import flixel.FlxG;
+import flixel.input.gamepad.FlxGamepad;
+import flixel.input.gamepad.FlxGamepadInputID as FlxPad;
+import flixel.input.keyboard.FlxKey;
+import load.Saved;
+import flixel.input.FlxInput.FlxInputState;
+
+/*enum Keybind {
+
+}*/
+class Controls
+{
+	public static function justPressed(bind:String):Bool
+	{
+		return checkBind(bind, JUST_PRESSED);
+	}
+
+	public static function pressed(bind:String):Bool
+	{
+		return checkBind(bind, PRESSED);
+	}
+
+	public static function released(bind:String):Bool
+	{
+		return checkBind(bind, JUST_RELEASED);
+	}
+
+	public static function checkBind(bind:String, inputState:FlxInputState):Bool
+	{
+		if(!allControls.exists(bind))
+		{
+			trace("that bind does not exist dumbass");
+			return false;
+		}
+
+		for(i in 0...allControls.get(bind)[0].length)
+		{
+			var key:FlxKey = allControls.get(bind)[0][i];
+			if(FlxG.keys.checkStatus(key, inputState)
+			&& key != FlxKey.NONE)
+				return true;
+		}
+
+		// gamepads
+		if(FlxG.gamepads.lastActive != null)
+		for(i in 0...allControls.get(bind)[1].length)
+		{
+			var key:FlxPad = allControls.get(bind)[1][i];
+			if(FlxG.gamepads.lastActive.checkStatus(key, inputState)
+			&& key != FlxPad.NONE)
+				return true;
+		}
+
+		return false;
+	}
+	
+	public static function setSoundKeys(?empty:Bool = false)
+	{
+		if(empty)
+		{
+			FlxG.sound.muteKeys 		= [];
+			FlxG.sound.volumeDownKeys 	= [];
+			FlxG.sound.volumeUpKeys 	= [];
+		}
+		else
+		{
+			FlxG.sound.muteKeys 		= [ZERO,  NUMPADZERO];
+			FlxG.sound.volumeDownKeys 	= [MINUS, NUMPADMINUS];
+			FlxG.sound.volumeUpKeys 	= [PLUS,  NUMPADPLUS];
+		}
+	}
+	
+	// self explanatory (i think)
+	public static final changeableControls:Array<String> = [
+		'LEFT', 'DOWN', 'UP', 'RIGHT',
+		'RESET',
+	];
+	
+	/*
+	** [0]: keyboard
+	** [1]: gamepad
+	*/
+	public static var allControls:Map<String, Array<Dynamic>> = [
+		// gameplay controls
+		'LEFT' => [
+			[FlxKey.A, FlxKey.LEFT],
+			[FlxPad.LEFT_TRIGGER, FlxPad.DPAD_LEFT],
+		],
+		'DOWN' => [
+			[FlxKey.S, FlxKey.DOWN],
+			[FlxPad.LEFT_SHOULDER, FlxPad.DPAD_DOWN],
+		],
+		'UP' => [
+			[FlxKey.W, FlxKey.UP],
+			[FlxPad.RIGHT_SHOULDER, FlxPad.DPAD_UP],
+		],
+		'RIGHT' => [
+			[FlxKey.D, FlxKey.RIGHT],
+			[FlxPad.RIGHT_TRIGGER, FlxPad.DPAD_RIGHT],
+		],
+		'RESET' => [
+			[FlxKey.R, FlxKey.NONE],
+			[FlxPad.BACK, FlxPad.NONE],
+		],
+
+		// ui controls
+		'UI_LEFT' => [
+			[FlxKey.A, FlxKey.LEFT],
+			[FlxPad.LEFT_STICK_DIGITAL_LEFT, FlxPad.DPAD_LEFT],
+		],
+		'UI_DOWN' => [
+			[FlxKey.S, FlxKey.DOWN],
+			[FlxPad.LEFT_STICK_DIGITAL_DOWN, FlxPad.DPAD_DOWN],
+		],
+		'UI_UP' => [
+			[FlxKey.W, FlxKey.UP],
+			[FlxPad.LEFT_STICK_DIGITAL_UP, FlxPad.DPAD_UP],
+		],
+		'UI_RIGHT' => [
+			[FlxKey.D, FlxKey.RIGHT],
+			[FlxPad.LEFT_STICK_DIGITAL_RIGHT, FlxPad.DPAD_RIGHT],
+		],
+
+		// ui buttons
+		'ACCEPT' => [
+			[FlxKey.SPACE, FlxKey.ENTER],
+			[FlxPad.A, FlxPad.X, FlxPad.START],
+		],
+		'BACK' => [
+			[FlxKey.BACKSPACE, FlxKey.ESCAPE],
+			[FlxPad.B],
+		],
+		'PAUSE' => [
+			[FlxKey.ENTER, FlxKey.ESCAPE],
+			[FlxPad.START],
+		],
+
+		'debug' => [
+			[FlxKey.SEVEN, FlxKey.SEVEN],
+			[FlxPad.A, FlxPad.X, FlxPad.START],
+		],
+	];
+
+	public static function load()
+	{
+		if(Saved.saveControls.data.allControls == null
+		|| Lambda.count(allControls) != Lambda.count(Saved.saveControls.data.allControls))
+		{
+			Saved.saveControls.data.allControls = allControls;
+		}
+		
+		// allControls = Saved.saveControls.data.allControls;
+		var impControls:Map<String, Array<Dynamic>> = Saved.saveControls.data.allControls;
+		for(label => key in impControls)
+		{
+			if(changeableControls.contains(label))
+				allControls.set(label, key);
+		}
+
+		save();
+	}
+
+	public static function save()
+	{
+		Saved.saveControls.data.allControls = allControls;
+		Saved.save();
+	}
+}
