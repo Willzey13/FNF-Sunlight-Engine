@@ -7,8 +7,8 @@ A Remake of a engine in which initially was going to be over FE (Forever Engine)
 
 We appreciate you using our engine, we are happy!! :)
 
-# IDEA OF CREATION 
-The Psych Engine and the Forever Engine are two distinct engines created from scratch, both contributing to the creation of the Sunlight Engine in the game Friday Night Funkin', with the latter representing a lighter and brighter atmosphere.
+# Idea
+The Sunlight Engine is a more optimized and positive version of the Psych Engine, while the Forever Engine is a distinct creation. Each of these engines contributes to the diversity of the game Friday Night Funkin', with the Sunlight Engine bringing a lighter and brighter atmosphere, in contrast to the Psych Engine, which offers a more challenging and distorted experience.
 
 # Friday Night Funkin'
 
