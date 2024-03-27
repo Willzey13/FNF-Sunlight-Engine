@@ -16,7 +16,7 @@ The Sunlight Engine is a more optimized and positive version of the Psych Engine
 <img src="https://art.ngfiles.com/images/5564000/5564684_620407_willzinhu_untitled-5564684.3549f64615d882d7d0e76e61446f29a4.webp?f1711513935">
 </p>
 
-nothing lol
+The Sunlight Engine is an uplifting and inspiring evolution of the creative and engaging spirit of Friday Night Funkin'. With its radiant atmosphere and exciting gameplay, the Sunlight Engine takes the gaming experience to new heights, offering players an even more vibrant and stimulating musical journey. Compatible with mod creation without the need for programming in HaxeFlixel source, the Sunlight Engine empowers creators to explore endless possibilities for customization and innovation within the FNF universe, keeping the legacy and fun of the original game alive.
 
 ### LIBRARIES
 The libraries were chosen by me and Toffe <3 :3
