@@ -43,7 +43,7 @@ discord_rpc
 * Marcello Richard - Story Menu UI Art
 
 # Special Thanks
-* Psych Engine - Week Loader and Story Menu
+* Psych Engine - Week Loader/Story Menu and Lua Support
 * Forever Engine - HXS loader
 * Nick - Musician pause screen
 
