@@ -12,13 +12,21 @@ class HealthIcon extends FlxSprite
 	public var sprTracker:FlxSprite;
 	public var initialWidth:Float = 0;
 	public var initialHeight:Float = 0;
+	public var charName:String = "";
 
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
 		super();
+		this.charName = char;
 		updateIcon(char, isPlayer);
 	}
 
+	public function changeIcon(char:String = 'bf', isPlayer:Bool = false)
+	{
+		updateIcon(char, isPlayer);
+	}
+
+	private var iconOffsets:Array<Float> = [0, 0];
 	public function updateIcon(char:String = 'bf', isPlayer:Bool = false)
 	{
 		var trimmedCharacter:String = char;
@@ -35,23 +43,31 @@ class HealthIcon extends FlxSprite
 			trace('$char icon trying $iconPath instead you fuck');
 		}
 
-		antialiasing = true;
-		var iconGraphic:FlxGraphic = Paths.image('icons/icon-' + iconPath);
-		loadGraphic(iconGraphic, true, Std.int(iconGraphic.width / 2), iconGraphic.height);
+		var graphic = Paths.image('icons/icon-' + iconPath);
+		loadGraphic(graphic, true, Math.floor(graphic.width / 2), Math.floor(graphic.height));
 
-		initialWidth = width;
-		initialHeight = height;
+		iconOffsets[0] = (width - 150) / 2;
+		iconOffsets[1] = (height - 150) / 2;
+		updateHitbox();
 
-		animation.add('icon', [0, 1], 0, false, isPlayer);
-		animation.play('icon');
+		animation.add(char, [0, 1], 0, false, isPlayer);
+		animation.play(char);
 		scrollFactor.set();
 	}
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		antialiasing = true;
 
 		if (sprTracker != null)
 			setPosition(sprTracker.x + sprTracker.width + 10, sprTracker.y - 30);
+	}
+
+	override function updateHitbox()
+	{
+		super.updateHitbox();
+		offset.x = iconOffsets[0];
+		offset.y = iconOffsets[1];
 	}
 }

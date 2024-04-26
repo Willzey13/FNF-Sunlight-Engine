@@ -12,7 +12,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxTimer;
 import data.MusicBeatState;
 import data.Song;
-import states.editors.MenuDebug;
+import states.editors.*;
 import options.OptionsState;
 
 using StringTools;
@@ -48,12 +48,14 @@ class MainMenuState extends MusicBeatState
 		bg = new FlxSprite().loadGraphic(Paths.image('menu/mainmenu/menuBG'));
 		bg.scale.set(1.2,1.2);
 		bg.updateHitbox();
+		bg.antialiasing = Saved.gameSettings.get("Antialiasing");
 		bg.screenCenter(X);
 		add(bg);
 		
 		bgMag = new FlxSprite().loadGraphic(Paths.image('menu/mainmenu/menuBGMagenta'));
 		bgMag.scale.set(bg.scale.x, bg.scale.y);
 		bgMag.updateHitbox();
+		bgMag.antialiasing = Saved.gameSettings.get("Antialiasing");
 		bgMag.visible = false;
 		add(bgMag);
 		
@@ -79,6 +81,7 @@ class MainMenuState extends MusicBeatState
 			grpOptions.add(item);
 			
 			item.scale.set(optionSize, optionSize);
+			item.antialiasing = Saved.gameSettings.get("Antialiasing");
 			item.updateHitbox();
 			
 			var itemSize:Float = (90 * optionSize);
@@ -133,12 +136,10 @@ class MainMenuState extends MusicBeatState
 			MusicBeatState.switchState(new MenuDebug());
 		}
 
-		/*if(FlxG.keys.justPressed.J)
+		if(FlxG.keys.justPressed.J)
 		{
-			optionShit.remove('options');
-			Main.skipStuff();
-			Main.switchState();
-		}
+			MusicBeatState.switchState(new AnimationDebug());
+		}/*
 		if(FlxG.keys.justPressed.K)
 		{
 			optionShit.push('options');
@@ -199,9 +200,9 @@ class MainMenuState extends MusicBeatState
 		}
 		else
 		{
-			if(Saved.data.get('Flashing Lights') != "OFF")
+			if(Saved.data.flashing)
 			{
-				if(Saved.data.get('Flashing Lights') != "REDUCED")
+				if(Saved.data.flashing)
 				{
 					flickMag += elapsed;
 					if(flickMag >= 0.15)

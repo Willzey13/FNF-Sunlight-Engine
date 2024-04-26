@@ -8,11 +8,11 @@ function loadAnimations()
 	character.animation.addByPrefix('singRIGHT', 'Dad Sing Note RIGHT', 24, false);
 	character.animation.addByPrefix('singDOWN', 'Dad Sing Note DOWN', 24, false);
 
-	character.addOffset('idle', -5, 0);
-	character.addOffset('singUP', -47, 28);
-	character.addOffset('singLEFT', 4, -7);
-	character.addOffset('singRIGHT', -48, -5);
-	character.addOffset('singDOWN', -22, -51);
+	character.addOffset('idle', -4, 380);
+	character.addOffset('singUP', -17, 428);
+	character.addOffset('singLEFT', -6, 393);
+	character.addOffset('singRIGHT', -18, 405);
+	character.addOffset('singDOWN', -5, 349);
 
 	//If character your is this player place in true recommended
 	character.flipX = false;

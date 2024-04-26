@@ -2,8 +2,13 @@ package load.hud;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.math.FlxPoint;
-import data.Conductor;
+import flixel.graphics.frames.FlxAtlasFrames;
+import flixel.math.FlxMath;
+import flixel.util.FlxColor;
+import flixel.util.FlxTimer;
+import states.PlayState;
+
+using StringTools;
 
 typedef EventNote = {
 	strumTime:Float,
@@ -14,112 +19,177 @@ typedef EventNote = {
 
 class Note extends FlxSprite
 {
-	public function new()
-	{
-		super();
-		//reloadNote(0, 0, "default");
+	public var parentNote:Note = null;
+	public var strumTime:Float = 0;
+	public var multSpeed(default, set):Float = 1;
+
+	public var mustPress:Bool = false;
+	public var mustMiss:Bool = false;
+	public var noteAngle:Float = 0;
+	public var noteCrochet:Float = 0;
+	public var noteData:Int = 0;
+	
+	public var noteType:String = "default";
+	public var canBeHit:Bool = false;
+	public var tooLate:Bool = false;
+	public var wasGoodHit:Bool = false;
+	public var prevNote:Note;
+
+	private var willMiss:Bool = false;
+
+	public var altNote:Bool = false;
+	public var invisNote:Bool = false;
+
+	public var sustainLength:Float = 0;
+	public var isSustain:Bool = false;
+	public var isSustainEnd:Bool = false;
+	public var noteScore:Float = 1;
+
+	public static var swagWidth:Float = 160 * 0.7;
+	public static var PURP_NOTE:Int = 0;
+	public static var GREEN_NOTE:Int = 2;
+	public static var BLUE_NOTE:Int = 1;
+	public static var RED_NOTE:Int = 3;
+	
+	public var noteID:Int = 0;
+	public var missed:Bool = false;
+	public var gotHit:Bool = false;
+	public var gotHeld:Bool = false;
+
+	public var children:Array<Note> = [];
+
+	public var sizeNote:Float = 0;
+	public var strumline:Int = 0;
+	public static var arrowColors:Array<Float> = [1, 1, 1, 1];
+	public var scrollSpeed:Float = Math.NEGATIVE_INFINITY;
+
+	//code Psych
+	private function set_multSpeed(value:Float):Float {
+		resizeByRatio(value / multSpeed);
+		multSpeed = value;
+		//trace('fuck cock');
+		return value;
 	}
 
-	public var prevNote:Note;
-	public var noteSize:Float = 1.0;
-	public var assetModifier:String = "base";
-	public static var swagWidth:Float = 160 * 0.7;
-	
-	public function reloadNote(songTime:Float, noteData:Int, ?noteType:String = "default", ?assetModifier:String = "base"):Note
+	public function resizeByRatio(ratio:Float) //haha funny twitter shit
 	{
-		var storedPos:Array<Float> = [x, y];
-		this.songTime = initialSongTime = songTime;
-		this.noteData = noteData;
+		if(isSustain && animation.curAnim != null && animation.curAnim.name != 'end')
+		{
+			scale.y *= ratio;
+			updateHitbox();
+		}
+	}
+	//End
+
+	public function new(strumTime:Float, noteData:Int, noteType:String = "default", strumline:Int, ?isSustain:Bool = false, ?prevNote:Note)
+	{
+		super();
+		reload(strumTime, noteData, noteType, strumline, isSustain, prevNote);
+	}
+
+	public var notePosition:FlxPoint = new FlxPoint(0,0);
+	public var holdLength:Float = 0;
+	public var curTextureNote:String = ""; //nothing :)
+	
+	public var rating:String = 'unknown';
+	public var ratingMod:Float = 0; //9 = unknown, 0.25 = shit, 0.5 = bad, 0.75 = good, 1 = sick
+
+	//plic function new(strumTime:Float, index:Int, noteType:String, strumline:Int, ?isSustain:Bool = false, ?prevNote:Note)
+	public function reload(strumTime:Float, noteData:Int, noteType:String = "default", strumline:Int, ?isSustain:Bool = false, ?prevNote:Note)
+	{
+		this.strumline = strumline;
+		this.prevNote = prevNote;
 		this.noteType = noteType;
-		this.assetModifier = assetModifier;
-		noteSize = 1.0;
-		mustMiss = false;
+		this.isSustain = isSustain;
+		this.strumTime = strumTime;
+		this.noteData = noteData;
 
-		var direction:String = Configs.getDirection(noteData);
-		var direColor:String = Configs.getNotesColor(noteData);
-		antialiasing = FlxSprite.defaultAntialiasing;
-		setAlpha();
+		//screenCenter();
 
-		switch(assetModifier)
+		if (prevNote == null)
+			prevNote = this;
+
+		var curTextureNote:String = PlayState.skinNotes;
+		this.curTextureNote = curTextureNote;
+		switch (curTextureNote)
 		{
 			case "pixel":
-				noteSize = 6;
-				if(!isHold)
-				{
-					loadGraphic(Paths.image("hud/notes/pixel/notesPixel_Sunlight"), true, 17, 17);
+				loadGraphic(Paths.image('hud/notes/pixel/notesPixel'));
+				sizeNote = 6;
 
-					animation.add(direction, [noteData + 4], 0, false);
-				}
-				else
-				{
-					loadGraphic(Paths.image("hud/notes/pixel/notesEnds_Sunlight"), true, 7, 6);
+				animation.add('greenScroll', [6]);
+				animation.add('redScroll', [7]);
+				animation.add('blueScroll', [5]);
+				animation.add('purpleScroll', [4]);
 
-					animation.add(direction, [noteData + (isHoldEnd ? 4 : 0)], 0, false);
+				if (isSustain)
+				{
+					loadGraphic(Paths.image('hud/notes/pixel/arrowEnds'), true, 7, 6);
+
+					animation.add('purpleholdend', [4]);
+					animation.add('greenholdend', [6]);
+					animation.add('redholdend', [7]);
+					animation.add('blueholdend', [5]);
+
+					animation.add('purplehold', [0]);
+					animation.add('greenhold', [2]);
+					animation.add('redhold', [3]);
+					animation.add('bluehold', [1]);
 				}
-				antialiasing = false;
-				animation.play(direction);
+
+				updateHitbox();
 
 			default:
-				switch(noteType)
-				{
-					default:
-						noteSize = 0.7;
-						frames = Paths.getSparrowAtlas("hud/notes/NOTE_assets");
-						// oxi que
-						animation.addByPrefix('greenScroll', 'green0');
-						animation.addByPrefix('redScroll', 'red0');
-						animation.addByPrefix('blueScroll', 'blue0');
-						animation.addByPrefix('purpleScroll', 'purple0');
+				frames = Paths.getSparrowAtlas('hud/notes/NOTE_assets');
 
-						animation.addByPrefix('purpleholdend', 'pruple end hold');
-						animation.addByPrefix('greenholdend', 'green hold end');
-						animation.addByPrefix('redholdend', 'red hold end');
-						animation.addByPrefix('blueholdend', 'blue hold end');
-
-						animation.addByPrefix('purplehold', 'purple hold piece');
-						animation.addByPrefix('greenhold', 'green hold piece');
-						animation.addByPrefix('redhold', 'red hold piece');
-						animation.addByPrefix('bluehold', 'blue hold piece');
+				if (curTextureNote == "sunlight"){
+					frames = Paths.getSparrowAtlas('hud/notes/SunLight_Note_Assets');
 				}
+
+				animation.addByPrefix('greenScroll', 'green0');
+				animation.addByPrefix('redScroll', 'red0');
+				animation.addByPrefix('blueScroll', 'blue0');
+				animation.addByPrefix('purpleScroll', 'purple0');
+
+				animation.addByPrefix('purpleholdend', 'pruple end hold');
+				animation.addByPrefix('greenholdend', 'green hold end');
+				animation.addByPrefix('redholdend', 'red hold end');
+				animation.addByPrefix('blueholdend', 'blue hold end');
+
+				animation.addByPrefix('purplehold', 'purple hold piece');
+				animation.addByPrefix('greenhold', 'green hold piece');
+				animation.addByPrefix('redhold', 'red hold piece');
+				animation.addByPrefix('bluehold', 'blue hold piece');
+
+				antialiasing = true;
+				sizeNote = 0.7;
+				updateHitbox();
 		}
 
-		switch(noteType)
-		{
-			case "EX Note":
-				var fold:String = 'base';
-				if(assetModifier == 'doido')
-					fold = 'doido';
-				
-				noteSize = ((fold == 'doido') ? 0.95 : 0.7);
-				mustMiss = true;
-				frames = Paths.getSparrowAtlas('notes/$fold/hurt_notes');
-				var typeName:String = (isHold ? (isHoldEnd ? "hold end" : "hold0") : direction);
-				
-				animation.addByPrefix('hurt', 'hurt $typeName', 0, false);
-				animation.play('hurt');
-		}
+		//trace('Type of texture load ${curTextureNote}');
+		//trace(isSustainEnd ? "This is Sustain Note End: " + isSustainEnd : "This is Sustain Note: " + isSustain);
 
 		switch (noteData)
 		{
 			case 0:
 				x += swagWidth * 0;
-				animation.play(isHoldEnd ? "purpleholdend" : 'purpleScroll');
+				animation.play('purpleScroll');
 			case 1:
 				x += swagWidth * 1;
-				animation.play(isHoldEnd ? "blueholdend" : 'blueScroll');
+				animation.play('blueScroll');
 			case 2:
 				x += swagWidth * 2;
-				animation.play(isHoldEnd ? "greenholdend" : 'greenScroll');
+				animation.play('greenScroll');
 			case 3:
 				x += swagWidth * 3;
-				animation.play(isHoldEnd ? "redholdend" : 'redScroll');
+				animation.play('redScroll');
 		}
 
-		if (isHold || isHoldEnd)
+		if (isSustain)
 		{
+			//noteScore * 0.2;
 			alpha = 0.6;
-
-			x += width / 2;
+			//x += width / 2;
 
 			switch (noteData)
 			{
@@ -135,111 +205,32 @@ class Note extends FlxSprite
 
 			updateHitbox();
 
-			x -= width / 2;
+			//x -= width / 2;
 
-			if (isHold)
+			if (isSustain)
 			{
 				switch (noteData)
 				{
 					case 0:
-						animation.play(isHoldEnd ? "purpleholdend" : 'purplehold');
+						animation.play(isSustainEnd ? 'purpleholdend' : 'purplehold');
 					case 1:
-						animation.play(isHoldEnd ? "blueholdend" : 'bluehold');
+						animation.play(isSustainEnd ? 'blueholdend' : 'bluehold');
 					case 2:
-						animation.play(isHoldEnd ? "greenholdend" : 'greenhold');
+						animation.play(isSustainEnd ? 'greenholdend' : 'greenhold');
 					case 3:
-						animation.play(isHoldEnd ? "redholdend" : 'redhold');
+						animation.play(isSustainEnd ? 'redholdend' : 'redhold');
 				}
+
+				//scale.y *= Conductor.stepCrochet / 100 * 1.5 * PlayState.SONG.speed;
+				updateHitbox();
 			}
 		}
-		//if(isHold)
-		//	antialiasing = false;
-
-		scale.set(noteSize, noteSize);
-		updateHitbox();
-
-		moves = false;
-		setPosition(storedPos[0], storedPos[1]);
-		return this;
 	}
-
-	// you can use this to fix 
-	public var noteOffset:FlxPoint = new FlxPoint(0,0);
-	
-	public var noteAngle:Float = 0;
-	
-	public var initialSongTime:Float = 0;
-	public var songTime:Float = 0;
-	public var noteData:Int = 0;
-	public var noteType:String = "default";
-
-	public function setSongOffset():Void
-		songTime = initialSongTime - Saved.data.get('Song Offset');
-
-	// in case you want to avoid notes this will do
-	public var mustMiss:Bool = false;
-
-	// doesnt actually change the scroll speed, just changes the hold note size
-	public var scrollSpeed:Float = Math.NEGATIVE_INFINITY;
-	
-	// hold note stuff
-	public var noteCrochet:Float = 0;
-	public var isHold:Bool = false;
-	public var isHoldEnd:Bool = false;
-	public var holdLength:Float = 0;
-	public var holdHitLength:Float = 0;
-	
-	public var children:Array<Note> = [];
-	public var parentNote:Note = null;
-
-	// instead of mustPress, the strumline is determined by their strumlineID's
-	public var strumlineID:Int = 0;
-	
-	public var missed:Bool = false;
-	public var gotHit:Bool = false;
-	public var gotHeld:Bool = false;
-	
-	public var spawned:Bool = false;
-	//public var canDespawn:Bool = false;
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-	}
-	
-	public var realAlpha:Float = 1;
-	public function setAlpha():Void
-	{
-		var multAlpha:Float = 1;
-		if(isHold)
-			multAlpha = (gotHit ? 0.2 : 0.7);
-		if(missed)
-			multAlpha = 0.2;
-		
-		// change realAlpha instead of alpha for this effect
-		alpha = realAlpha * multAlpha;
-	}
 
-	public function checkActive():Void
-	{
-		visible = active = alive = (Math.abs(songTime - Conductor.songPosition) < Conductor.crochet * 2);
-
-		// making sure you dont see it anymore
-		if(gotHit && !isHold)
-			visible = false;
-	}
-	
-	// sets (probably) every value the note has to the default value
-	public function resetNote()
-	{
-		visible = true;
-		missed = false;
-		gotHit = false;
-		gotHeld = false;
-		holdHitLength = 0;
-		//spawned = false;
-		
-		clipRect = null;
-		setAlpha();
+		scale.set(sizeNote, sizeNote);
 	}
 }

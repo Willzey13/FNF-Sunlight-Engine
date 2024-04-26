@@ -89,9 +89,9 @@ class Configs
 
 	inline public static function noteWidth()
 		return (160 * 0.7);
-		
+
 	public static function sortByShit(Obj1:Note, Obj2:Note):Int
-		return FlxSort.byValues(FlxSort.ASCENDING, Obj1.songTime, Obj2.songTime);
+		return FlxSort.byValues(FlxSort.ASCENDING, Obj1.strumTime, Obj2.strumTime);
 
 	public static function setNotePos(note:FlxSprite, target:FlxSprite, angle:Float, offsetX:Float, offsetY:Float)
 	{
@@ -112,9 +112,9 @@ class Configs
 		
 		if(!forced)
 		{
-			if(Saved.data.get("Flashing Lights") == "OFF") return;
+			if(!Saved.data.flashing) return;
 
-			if(Saved.data.get("Flashing Lights") == "REDUCED")
+			if(Saved.data.flashing)
 				color.alphaFloat = 0.4;
 		}
 		camera.flash(color, duration, null, true);

@@ -78,6 +78,8 @@ class FreeplayState extends MusicBeatState
 	override function create()
 	{
 		super.create();
+		//Paths.clearStoredMemory();
+		Paths.clearUnusedMemory();
 
 		mutex = new Mutex();
 		var folderSongs:Array<String> = Paths.returnAssetsLibrary('data', 'assets');

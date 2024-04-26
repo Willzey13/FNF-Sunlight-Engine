@@ -20,9 +20,11 @@ class Alphabet extends FlxSpriteGroup
 	public var letters:Array<AlphaCharacter> = [];
 
 	public var isMenuItem:Bool = false;
-	public var targetY:Int = 0;
+	public var targetY:Float = 0;
+	public var xDisableSet:Bool = false;
 	public var changeX:Bool = true;
 	public var changeY:Bool = true;
+	public var xTo:Int = 100;
 
 	public var alignment(default, set):Alignment = LEFT;
 	public var scaleX(default, set):Float = 1;
@@ -35,6 +37,7 @@ class Alphabet extends FlxSpriteGroup
 	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true)
 	{
 		super(x, y);
+		antialiasing = Saved.gameSettings.get("Antialiasing");
 
 		this.startPosition.x = x;
 		this.startPosition.y = y;
