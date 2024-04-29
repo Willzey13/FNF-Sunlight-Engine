@@ -1008,8 +1008,14 @@ class PlayState extends MusicBeatState
 			timeTxt.screenCenter(X);
 		}
 
+
 		if (health == 0)
+		{
+			persistentUpdate = false;
+			persistentDraw = false;
+			CoolUtil.killMusic([inst, vocals]);
 			openSubState(new GameOverSubstate());
+		}
 	}
 
 	// actual note functions
