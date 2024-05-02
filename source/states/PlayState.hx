@@ -1072,7 +1072,7 @@ class PlayState extends MusicBeatState
 
 		if (Conductor.songPosition >= songLength)
 		{
-			endingSong = true;
+			endingSong = true; 
 			if (endingSong)
 				endSong();
 		}
