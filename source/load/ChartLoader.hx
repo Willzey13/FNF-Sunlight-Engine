@@ -1,107 +1,127 @@
 package load;
 
-import flixel.util.FlxSort;
-import data.Song.SwagSong;
+import states.PlayState;
+import data.SunlightModule;
+import data.ScriptData;
+import data.Song;
 import data.Section.SwagSection;
-import load.hud.Note;
-import data.Conductor;
+import flixel.util.FlxColor;
+import flixel.FlxG;
+import flixel.FlxSprite;
+import flixel.math.FlxMath;
+import flixel.text.FlxText;
+import load.hud.*;
 
-using StringTools;
+class ChartLoader {
+    public static function generateChartType(songData:SwagSong):Dynamic {
+        var chartData:Array<Dynamic> = [];
 
-class ChartLoader
-{
-	public static function getChart(SONG:SwagSong):Array<Note>
-	{
-		var unspawnNotes:Array<Note> = [];
-		var daSection:Int = 0;
-		
-		// bpm change stuff for sustain notes
-		var noteCrochet:Float = Conductor.stepCrochet;
-		
-		for(section in SONG.notes)
-		{
-			for(event in Conductor.bpmChangeMap)
-				if(event.stepTime == (daSection * 16))
-				{
-					noteCrochet = Conductor.calcStep(event.bpm);
-					trace('changed note bpm ${event.bpm}');
-				}
-			
-			for (songNotes in section.sectionNotes)
-			{
-				/* - late || + early */
-				var daStrumTime:Float = songNotes[0];
-				var daNoteData:Int = Std.int(songNotes[1] % 4);
-				var daNoteType:String = 'none';
-				// very stupid but I'm lazy
-				if(songNotes.length > 2)
-					daNoteType = songNotes[3];
-				
-				// psych event notes come on
-				if(songNotes[1] < 0) continue;
-				
-				// create the new note
-				var swagNote:Note = new Note();
-				swagNote.reloadNote(daStrumTime, daNoteData, daNoteType);
-				
-				unspawnNotes.push(swagNote);
-				
-				var isPlayer = (songNotes[1] >= 4);
-				if(section.mustHitSection)
-					isPlayer = (songNotes[1] <  4);
-				
-				swagNote.strumlineID = isPlayer ? 1 : 0;
-				
-				var susLength:Float = songNotes[2];
-				if(susLength > 0)
-				{
-					var daParent:Note = swagNote;
-					
-					swagNote.holdLength = susLength;
-					swagNote.noteCrochet = noteCrochet;
-					
-					var holdLoop:Int = Math.floor(susLength / noteCrochet);
-					if (holdLoop <= 0)
-						holdLoop = 1;
-					
-					var holdID:Int = 0;
-					for(j in 0...(holdLoop + 1))
-					{
-						var isHoldEnd = (j == holdLoop);
-						
-						var holdNote:Note = new Note();
-						holdNote.isHold = true;
-						holdNote.isHoldEnd = isHoldEnd;
-						holdNote.reloadNote(daStrumTime, daNoteData, daNoteType);
-						
-						holdNote.parentNote = daParent;
-						holdNote.strumlineID = swagNote.strumlineID;
-						holdNote.ID = holdID;
-						
-						// uhhh
-						holdNote.holdLength = susLength;
-						holdNote.noteCrochet = noteCrochet;
-						
-						unspawnNotes.push(holdNote);
-						
-						//holdNote.ID = j + 1;
-						/*holdNote.color = flixel.util.FlxColor.fromRGB(
-							FlxG.random.int(0,255),
-							FlxG.random.int(0,255),
-							FlxG.random.int(0,255)
-						);*/
-						
-						daParent = holdNote;
-						swagNote.children.push(holdNote);
-						holdID++;
-					}
-				}
-			}
-			daSection++;
-		}
-		
-		unspawnNotes.sort(Configs.sortByShit);
-		
-		return unspawnNotes;
-	}
+        return generateNoteChart(songData.notes);
+    }
+
+    private static function generateNoteChart(noteData:Array<SwagSection>):Array<Note> {
+        var unspawnNotes:Array<Note> = [];
+
+        for (section in noteData) {
+            for (songNotes in section.sectionNotes) {
+
+                var note:Note = createNoteFromData(songNotes, section);
+                var noteCrochet:Float = Conductor.stepCrochet;
+                var daStrumTime:Float = songNotes[0];
+                var daNoteData:Int = Std.int(songNotes[1] % 4);
+                var daNoteType:String = 'none';
+                var gottaHitNote:Bool = section.mustHitSection;
+
+                unspawnNotes.push(note);
+
+                if (songNotes[1] > 3)
+                {
+                    gottaHitNote = !section.mustHitSection;
+                }
+
+                var isPlayer = (songNotes[1] >= 4);
+                if(section.mustHitSection)
+                    isPlayer = (songNotes[1] <  4);
+
+
+                note.gfNote = (section.gfSection && (songNotes[1]<4));
+                note.mustPress = gottaHitNote;
+                note.noteID = gottaHitNote ? 1 : 0;
+
+                var susLength:Float = songNotes[2];
+                if(susLength > 0)
+                {
+                    var daParent:Note = note;
+                    
+                    note.holdLength = susLength;
+                    note.noteCrochet = noteCrochet;
+                    
+                    var holdLoop:Int = Math.floor(susLength / noteCrochet);
+                    if (holdLoop <= 0)
+                        holdLoop = 1;
+                    
+                    var holdID:Int = 0;
+                    for(i in 0...(holdLoop + 1))
+                    {
+                        var isSustainEnd = (i == holdLoop);
+                        
+                        var isSustainNote:Note = new Note(daStrumTime, daNoteData, daNoteType, 0, true);
+                        isSustainNote.isSustain = true;
+                        isSustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
+                        isSustainNote.isSustainEnd = isSustainEnd;
+                        //isSustainNote.reloadNote(daStrumTime, daNoteData, daNoteType, 0, true);
+                        
+                        isSustainNote.parentNote = daParent;
+                        isSustainNote.noteID = note.noteID;
+                        isSustainNote.ID = holdID;
+                        isSustainNote.holdLength = susLength;
+                        isSustainNote.noteCrochet = noteCrochet;
+                        
+                        unspawnNotes.push(isSustainNote);
+                        
+                        daParent = isSustainNote;
+                        note.children.push(isSustainNote);
+                        holdID++;
+                    }
+                }
+            }
+        }
+
+        return unspawnNotes;
+    }
+
+    private static function createNoteFromData(songNotes:Array<Dynamic>, section:SwagSection) {
+        var daStrumTime:Float = calculateStrumTime(songNotes[0]);
+        var daNoteData:Int = Std.int(songNotes[1] % 4);
+        var daNoteType:String = getNoteType(songNotes);
+        var unspawnNotes:Array<Note> = [];
+
+        var gottaHitNote:Bool = section.mustHitSection;
+        if (songNotes[1] > 3) {
+            gottaHitNote = !section.mustHitSection;
+        }
+
+        var oldNote:Note = (unspawnNotes.length > 0) ? unspawnNotes[Std.int(unspawnNotes.length - 1)] : null;
+
+        return new Note(daStrumTime, daNoteData, daNoteType, gottaHitNote ? 1 : 0, false, oldNote);
+    }
+
+    private static function calculateStrumTime(rawTime:Float) {
+        return #if !neko rawTime #else rawTime #end;
+    }
+
+    private static function getNoteType(songNotes:Array<Dynamic>) {
+        var daNoteType:String = "default";
+        if (songNotes.length > 2) {
+            if (Std.isOfType(songNotes[3], String)) {
+                switch (songNotes[3]) {
+                    case "Hurt Note":
+                        daNoteType = "mine";
+                    default:
+                        daNoteType = "default";
+                }
+            }
+        }
+        return daNoteType;
+    }
 }

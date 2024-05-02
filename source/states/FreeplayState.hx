@@ -1,11 +1,14 @@
 package states;
 
+import Controls;
 import data.*;
-import ui.Highscore;
 import data.Song.SwagSong;
-import ui.Discord.DiscordClient;
 import data.MusicBeatState;
+import ui.Discord.DiscordClient;
+import ui.Highscore;
 import ui.Alphabet;
+import load.Highscore;
+import load.hud.HealthIcon;
 import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -18,11 +21,9 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.tweens.misc.ColorTween;
 import flixel.util.FlxColor;
-import load.hud.HealthIcon;
 import lime.utils.Assets;
 import openfl.media.Sound;
 import sys.FileSystem;
-import Controls;
 import sys.thread.Mutex;
 import sys.thread.Thread;
 
@@ -78,6 +79,9 @@ class FreeplayState extends MusicBeatState
 	override function create()
 	{
 		super.create();
+		//Paths.clearStoredMemory();
+		Paths.clearUnusedMemory();
+		Configs.playMusic('freakyMenu');
 
 		mutex = new Mutex();
 		var folderSongs:Array<String> = Paths.returnAssetsLibrary('data', 'assets');
@@ -116,6 +120,8 @@ class FreeplayState extends MusicBeatState
 			icon.sprTracker = songText;
 			iconArray.push(icon);
 			add(icon);
+
+			songText.x = FlxG.width + 200;
 		}
 
 		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, "", 32);
@@ -200,9 +206,10 @@ class FreeplayState extends MusicBeatState
 
 		if (Controls.justPressed("ACCEPT"))
 		{
-			var poop:String = "";
+			var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(),
+				Configs.difficultyArray.indexOf(existingDifficulties[curSelected][curDifficulty]));
 
-			PlayState.SONG = Song.loadFromJson(songs[curSelected].songName + poop, songs[curSelected].songName.toLowerCase());
+			PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
 			PlayState.isStoryMode = false;
 			PlayState.storyDifficulty = curDifficulty;
 
@@ -274,64 +281,20 @@ class FreeplayState extends MusicBeatState
 			bullShit++;
 
 			item.alpha = 0.6;
-			// item.setGraphicSize(Std.int(item.width * 0.8));
+			//item.setGraphicSize(Std.int(item.width * 0.8));
 
 			if (item.targetY == 0)
 			{
 				item.alpha = 1;
-				// item.setGraphicSize(Std.int(item.width));
+				item.x = 20 / 2;
+				//item.setGraphicSize(Std.int(item.width));
 			}
 		}
 		//
 
-		trace("curSelected: " + curSelected);
+		//trace("curSelected: " + curSelected);
 
 		changeDiff();
-		changeSongPlaying();
-	}
-
-	function changeSongPlaying()
-	{
-		if (songThread == null)
-		{
-			songThread = Thread.create(function()
-			{
-				while (true)
-				{
-					if (!threadActive)
-					{
-						trace("Killing thread");
-						return;
-					}
-
-					var index:Null<Int> = Thread.readMessage(false);
-					if (index != null)
-					{
-						if (index == curSelected && index != curSongPlaying)
-						{
-							trace("Loading index " + index);
-
-							var inst:Sound = Paths.inst(songs[curSelected].songName);
-
-							if (index == curSelected && threadActive)
-							{
-								mutex.acquire();
-								songToPlay = inst;
-								mutex.release();
-
-								curSongPlaying = curSelected;
-							}
-							else
-								trace("Nevermind, skipping " + index);
-						}
-						else
-							trace("Skipping " + index);
-					}
-				}
-			});
-		}
-
-		songThread.sendMessage(curSelected);
 	}
 
 	var playingSongs:Array<FlxSound> = [];

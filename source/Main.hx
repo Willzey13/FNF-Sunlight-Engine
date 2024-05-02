@@ -1,21 +1,21 @@
 package;
 
+import data.*;
 import flixel.FlxG;
-import flixel.FlxState;
 import flixel.FlxGame;
-import openfl.display.Sprite;
-import states.TitleState;
+import flixel.FlxState;
+import flixel.math.FlxMath;
+import haxe.CallStack;
 import haxe.CallStack;
 import haxe.ds.StringMap;
-import data.*;
-import flixel.math.FlxMath;
-import lime.app.Application;
-import openfl.events.UncaughtErrorEvent;
-import haxe.CallStack;
 import haxe.io.Path;
+import lime.app.Application;
+import openfl.Lib;
+import openfl.display.Sprite;
+import openfl.events.UncaughtErrorEvent;
+import states.TitleState;
 import sys.FileSystem;
 import sys.io.File;
-import openfl.Lib;
 import ui.Discord.DiscordClient;
 import ui.FPSCounter;
 
@@ -24,19 +24,23 @@ using StringTools;
 class Main extends Sprite
 {
 	var fpsCount:FPSCounter;
+
 	public static var activeState:FlxState;
+
 	public function new()
 	{
 		super();
-		if (!DiscordClient.isInitialized) {
+		if (!DiscordClient.isInitialized)
+		{
 			DiscordClient.initialize();
-			Application.current.window.onClose.add(function() {
+			Application.current.window.onClose.add(function()
+			{
 				DiscordClient.shutdown();
 			});
 		}
 
 		addChild(new FlxGame(0, 0, TitleState, 60, 60, true));
-		
+
 		fpsCount = new FPSCounter(10, 3);
 		addChild(fpsCount);
 
@@ -85,6 +89,6 @@ class Main extends Sprite
 	public static function camPosLerpVeryLerp(cam:flixel.FlxCamera, target:flixel.FlxObject, lerp:Float = 1)
 	{
 		cam.scroll.x = FlxMath.lerp(cam.scroll.x, target.x - FlxG.width / 2, lerp);
-		cam.scroll.y = FlxMath.lerp(cam.scroll.y, target.y - FlxG.height/ 2, lerp);
+		cam.scroll.y = FlxMath.lerp(cam.scroll.y, target.y - FlxG.height / 2, lerp);
 	}
 }

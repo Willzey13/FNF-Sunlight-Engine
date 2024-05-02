@@ -33,6 +33,8 @@ class TitleState extends MusicBeatState
 	override function create()
 	{
 		super.create();
+		Saved.init();
+
 		if(!introEnded)
 		{
 			new FlxTimer().start(0.5, function(tmr:FlxTimer) {
@@ -56,6 +58,7 @@ class TitleState extends MusicBeatState
 		gf.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
 		gf.animation.addByIndices('danceRight','gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
 		gf.x = FlxG.width - gf.width - 20;
+		gf.antialiasing = Saved.gameSettings.get("Antialiasing");
 		gf.screenCenter(Y);
 		add(gf);
 		gf.animation.play('danceLeft');
@@ -65,6 +68,7 @@ class TitleState extends MusicBeatState
 		add(blackScreen);
 
 		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('menu/title/newgrounds_logo'));
+		ngSpr.antialiasing = Saved.gameSettings.get("Antialiasing");
 		add(ngSpr);
 		ngSpr.visible = false;
 		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));

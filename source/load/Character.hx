@@ -7,10 +7,10 @@ import data.ScriptData;
 import data.SunlightModule;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
-import load.CharacterOffsets.DoidoOffsets;
 import haxe.ds.StringMap;
 import sys.FileSystem;
 import sys.io.File;
+import load.hud.HealthIcon;
 
 using StringTools;
 
@@ -32,11 +32,13 @@ class Character extends FlxSprite
 	public var isSpectator:Bool = false;
 
 	public var globalOffset:FlxPoint = new FlxPoint();
-	public var cameraOffset:FlxPoint = new FlxPoint();
+	public var cameraPosition:Array<Float> = [0, 0];
 	public var ratingsOffset:FlxPoint = new FlxPoint();
 	private var scaleOffset:FlxPoint = new FlxPoint();
 	
 	public var healthColorArray:Array<Int> = [255, 0, 0];
+	public var size:Float = 1;
+	public var icon:String = "bf";
 
 	public function new(x:Float = 0, y:Float = 0)
 		super(x, y);
@@ -53,13 +55,12 @@ class Character extends FlxSprite
 
 		flipX = flipY = false;
 		scale.set(1,1);
-		antialiasing = FlxSprite.defaultAntialiasing;
+		antialiasing = Saved.gameSettings.get("Antialiasing");
 		deathChar = "bf";
 
 		animOffsets = new Map<String, Array<Dynamic>>();
 		var storedPos:Array<Float> = [x, y];
 		globalOffset.set();
-		cameraOffset.set();
 		ratingsOffset.set();
 
 		var path:String = LoaderManager.getPath('$character', 'images/characters/$character', MODULE);
@@ -73,7 +74,7 @@ class Character extends FlxSprite
 				character.get("loadAnimations")();
 		}
 		else
-			trace('Character not load, Character as NULL');
+			trace('Character not found, loading default character ${curChar}');
 
 		if (!FileSystem.exists(path))
 		{
@@ -84,74 +85,14 @@ class Character extends FlxSprite
 				defaultChar.get("loadAnimations")();
 		}
 
-		// what
-		/*switch(curChar)
-		{
-			case "bf":
-				frames = Paths.getSparrowAtlas("characters/bf/BOYFRIEND");
+		if (size != 1) {
+			scale.set(size, size);
+			updateHitbox();
+		}
 
-				animation.addByPrefix('idle', 			'BF idle dance', 		24, false);
-				animation.addByPrefix('singUP', 		'BF NOTE UP0', 			24, false);
-				animation.addByPrefix('singLEFT', 		'BF NOTE LEFT0', 		24, false);
-				animation.addByPrefix('singRIGHT', 		'BF NOTE RIGHT0', 		24, false);
-				animation.addByPrefix('singDOWN', 		'BF NOTE DOWN0', 		24, false);
-				animation.addByPrefix('singUPmiss', 	'BF NOTE UP MISS', 		24, false);
-				animation.addByPrefix('singLEFTmiss', 	'BF NOTE LEFT MISS', 	24, false);
-				animation.addByPrefix('singRIGHTmiss', 	'BF NOTE RIGHT MISS', 	24, false);
-				animation.addByPrefix('singDOWNmiss', 	'BF NOTE DOWN MISS', 	24, false);
-				animation.addByPrefix('hey', 			'BF HEY!!', 			24, false);
+		if (icon == null)
+			icon = "face";
 
-				animation.addByPrefix('firstDeath', 	"BF dies", 			24, false);
-				animation.addByPrefix('deathLoop', 		"BF Dead Loop", 	24, true);
-				animation.addByPrefix('deathConfirm', 	"BF Dead confirm", 	24, false);
-
-				animation.addByPrefix('scared', 'BF idle shaking', 24);
-
-				flipX = true;
-				loadOffsetFile("bf");
-
-			case "gf" | "gf-tutorial":
-				// GIRLFRIEND CODE
-				frames = Paths.getSparrowAtlas('characters/gf/GF_assets' + ((curChar == "gf-tutorial") ? "_singer" : ""));
-				animation.addByPrefix('cheer', 'GF Cheer', 24, false);
-				if(curChar == 'gf-tutorial')
-				{
-					animation.addByPrefix('singLEFT', 	'GF left note', 24, false);
-					animation.addByPrefix('singRIGHT', 	'GF Right Note', 24, false);
-					animation.addByPrefix('singUP', 	'GF Up Note', 24, false);
-					animation.addByPrefix('singDOWN', 	'GF Down Note', 24, false);
-				}
-				animation.addByIndices('sad', 		'gf sad', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "", 24, false);
-				animation.addByIndices('danceLeft', 'GF Dancing Beat', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-				animation.addByIndices('danceRight','GF Dancing Beat', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-				//animation.addByIndices('hairBlow', 	"GF Dancing Beat Hair blowing", [0, 1, 2, 3], "", 24);
-				//animation.addByIndices('hairFall', 	"GF Dancing Beat Hair Landing", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], "", 24, false);
-				animation.addByPrefix('scared', 'GF FEAR', 24);
-
-				idleAnims = ["danceLeft", "danceRight"];
-				quickDancer = true;
-				flipX = isPlayer;
-				loadOffsetFile("gf");
-
-			case "dad":
-				// DAD ANIMATION LOADING CODE
-				frames = Paths.getSparrowAtlas("characters/dad/DADDY_DEAREST");
-				animation.addByPrefix('idle', 		'Dad idle dance', 		24, false);
-				animation.addByPrefix('singUP', 	'Dad Sing Note UP', 	24, false);
-				animation.addByPrefix('singRIGHT', 	'Dad Sing Note RIGHT', 	24, false);
-				animation.addByPrefix('singDOWN', 	'Dad Sing Note DOWN', 	24, false);
-				animation.addByPrefix('singLEFT', 	'Dad Sing Note LEFT', 	24, false);
-
-				animation.addByIndices('idle-loop', 	'Dad idle dance',  [11,12,13,14], "", 24, true);
-				animation.addByIndices('singUP-loop', 	'Dad Sing Note UP',    [3,4,5,6], "", 24, true);
-				animation.addByIndices('singRIGHT-loop','Dad Sing Note RIGHT', [3,4,5,6], "", 24, true);
-				animation.addByIndices('singLEFT-loop', 'Dad Sing Note LEFT',  [3,4,5,6], "", 24, true);
-				loadOffsetFile("dad");
-
-			default:
-				return reloadChar(isPlayer ? "bf" : "dad");
-		}*/
-		
 		if(isPlayer)
 			flipX = !flipX;
 

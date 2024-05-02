@@ -1,170 +1,130 @@
 package;
 
-import flixel.FlxG;
-import flixel.input.gamepad.FlxGamepad;
 import flixel.input.gamepad.FlxGamepadInputID as FlxPad;
+import sys.io.File;
 import flixel.input.keyboard.FlxKey;
-import load.Saved;
 import flixel.input.FlxInput.FlxInputState;
 
-/*enum Keybind {
-
-}*/
-class Controls
+class Controls 
 {
-	public static function justPressed(bind:String):Bool
-	{
-		return checkBind(bind, JUST_PRESSED);
-	}
+    public static var JUST_PRESSED:FlxInputState = FlxInputState.JUST_PRESSED;
+    public static var PRESSED:FlxInputState = FlxInputState.PRESSED;
+    public static var JUST_RELEASED:FlxInputState = FlxInputState.JUST_RELEASED;
 
-	public static function pressed(bind:String):Bool
-	{
-		return checkBind(bind, PRESSED);
-	}
-
-	public static function released(bind:String):Bool
-	{
-		return checkBind(bind, JUST_RELEASED);
-	}
-
-	public static function checkBind(bind:String, inputState:FlxInputState):Bool
-	{
-		if(!allControls.exists(bind))
-		{
-			trace("that bind does not exist dumbass");
-			return false;
-		}
-
-		for(i in 0...allControls.get(bind)[0].length)
-		{
-			var key:FlxKey = allControls.get(bind)[0][i];
-			if(FlxG.keys.checkStatus(key, inputState)
-			&& key != FlxKey.NONE)
-				return true;
-		}
-
-		// gamepads
-		if(FlxG.gamepads.lastActive != null)
-		for(i in 0...allControls.get(bind)[1].length)
-		{
-			var key:FlxPad = allControls.get(bind)[1][i];
-			if(FlxG.gamepads.lastActive.checkStatus(key, inputState)
-			&& key != FlxPad.NONE)
-				return true;
-		}
-
-		return false;
-	}
-	
-	public static function setSoundKeys(?empty:Bool = false)
-	{
-		if(empty)
-		{
-			FlxG.sound.muteKeys 		= [];
-			FlxG.sound.volumeDownKeys 	= [];
-			FlxG.sound.volumeUpKeys 	= [];
-		}
-		else
-		{
-			FlxG.sound.muteKeys 		= [ZERO,  NUMPADZERO];
-			FlxG.sound.volumeDownKeys 	= [MINUS, NUMPADMINUS];
-			FlxG.sound.volumeUpKeys 	= [PLUS,  NUMPADPLUS];
-		}
-	}
-	
-	// self explanatory (i think)
-	public static final changeableControls:Array<String> = [
-		'LEFT', 'DOWN', 'UP', 'RIGHT',
-		'RESET',
-	];
-	
-	/*
-	** [0]: keyboard
-	** [1]: gamepad
-	*/
-	public static var allControls:Map<String, Array<Dynamic>> = [
-		// gameplay controls
-		'LEFT' => [
-			[FlxKey.A, FlxKey.LEFT],
-			[FlxPad.LEFT_TRIGGER, FlxPad.DPAD_LEFT],
-		],
-		'DOWN' => [
-			[FlxKey.S, FlxKey.DOWN],
-			[FlxPad.LEFT_SHOULDER, FlxPad.DPAD_DOWN],
-		],
-		'UP' => [
-			[FlxKey.W, FlxKey.UP],
-			[FlxPad.RIGHT_SHOULDER, FlxPad.DPAD_UP],
-		],
-		'RIGHT' => [
-			[FlxKey.D, FlxKey.RIGHT],
-			[FlxPad.RIGHT_TRIGGER, FlxPad.DPAD_RIGHT],
-		],
-		'RESET' => [
-			[FlxKey.R, FlxKey.NONE],
-			[FlxPad.BACK, FlxPad.NONE],
-		],
-
-		// ui controls
-		'UI_LEFT' => [
-			[FlxKey.A, FlxKey.LEFT],
-			[FlxPad.LEFT_STICK_DIGITAL_LEFT, FlxPad.DPAD_LEFT],
-		],
-		'UI_DOWN' => [
-			[FlxKey.S, FlxKey.DOWN],
-			[FlxPad.LEFT_STICK_DIGITAL_DOWN, FlxPad.DPAD_DOWN],
-		],
-		'UI_UP' => [
-			[FlxKey.W, FlxKey.UP],
-			[FlxPad.LEFT_STICK_DIGITAL_UP, FlxPad.DPAD_UP],
-		],
-		'UI_RIGHT' => [
-			[FlxKey.D, FlxKey.RIGHT],
-			[FlxPad.LEFT_STICK_DIGITAL_RIGHT, FlxPad.DPAD_RIGHT],
-		],
-
-		// ui buttons
-		'ACCEPT' => [
-			[FlxKey.SPACE, FlxKey.ENTER],
-			[FlxPad.A, FlxPad.X, FlxPad.START],
-		],
-		'BACK' => [
-			[FlxKey.BACKSPACE, FlxKey.ESCAPE],
-			[FlxPad.B],
-		],
-		'PAUSE' => [
-			[FlxKey.ENTER, FlxKey.ESCAPE],
-			[FlxPad.START],
-		],
-
-		'debug' => [
-			[FlxKey.SEVEN, FlxKey.SEVEN],
-			[FlxPad.A, FlxPad.X, FlxPad.START],
-		],
+    public static var allControls:Map<String, Array<Dynamic>> = [
+        'LEFT' =>         [[A, FlxKey.LEFT], 0],
+        'DOWN' =>         [[S, FlxKey.DOWN], 1],
+		'UP' =>           [[W, FlxKey.UP], 2],
+        'RIGHT' =>        [[D, FlxKey.RIGHT], 3],
+        'UI_LEFT' =>      [[A, FlxKey.LEFT], 4],
+        'UI_DOWN' =>      [[S, FlxKey.DOWN], 5],
+        'UI_UP' =>        [[W, FlxKey.UP], 6],
+        'UI_RIGHT' =>     [[D, FlxKey.RIGHT], 7],
+        'ACCEPT' =>       [[Z, FlxKey.SPACE, FlxKey.ENTER], 8],
+        'BACK' =>         [[X, FlxKey.BACKSPACE, FlxKey.ESCAPE], 9],
+        'PAUSE' =>        [[P, FlxKey.ENTER], 10],
+        'RESET' =>        [[R, null], 11],
+        'BOTPLAY' =>      [[FlxKey.B, null], 12],
+		'debug' =>        [[FlxKey.SEVEN, FlxKey.SEVEN], [FlxPad.A, FlxPad.X, FlxPad.START],
+        ],
 	];
 
-	public static function load()
-	{
-		if(Saved.saveControls.data.allControls == null
-		|| Lambda.count(allControls) != Lambda.count(Saved.saveControls.data.allControls))
-		{
-			Saved.saveControls.data.allControls = allControls;
-		}
-		
-		// allControls = Saved.saveControls.data.allControls;
-		var impControls:Map<String, Array<Dynamic>> = Saved.saveControls.data.allControls;
-		for(label => key in impControls)
-		{
-			if(changeableControls.contains(label))
-				allControls.set(label, key);
-		}
+    public static function justPressed(bind:String):Bool
+    {
+        return checkBind(bind, JUST_PRESSED);
+    }
 
-		save();
-	}
+    public static function pressed(bind:String):Bool
+    {
+        return checkBind(bind, PRESSED);
+    }
 
-	public static function save()
-	{
-		Saved.saveControls.data.allControls = allControls;
-		Saved.save();
-	}
+    public static function released(bind:String):Bool
+    {
+        return checkBind(bind, JUST_RELEASED);
+    }
+
+    public static function checkBind(bind:String, inputState:FlxInputState):Bool
+    {
+        if(!allControls.exists(bind))
+        {
+            trace("Este atalho não existe.");
+            return false;
+        }
+
+        for(i in 0...allControls.get(bind)[0].length)
+        {
+            var key:FlxKey = allControls.get(bind)[0][i];
+            if(FlxG.keys.checkStatus(key, inputState) && key != FlxKey.NONE)
+                return true;
+        }
+
+        if(FlxG.gamepads.lastActive != null)
+        for(i in 0...allControls.get(bind)[1].length)
+        {
+            var key:FlxPad = allControls.get(bind)[1][i];
+            if(FlxG.gamepads.lastActive.checkStatus(key, inputState) && key != FlxPad.NONE)
+                return true;
+        }
+
+        return false;
+    }
+    
+    public static function setControls(bind:String, keys:Array<FlxKey>, gamepadKeys:Array<FlxPad>):Void
+    {
+        allControls.set(bind, [keys, gamepadKeys]);
+    }
+
+    public static function saveControls(filename:String):Void {
+        var file = File.write(filename, false);
+        for (bind in allControls.keys()) {
+            file.writeString(bind + ":");
+            file.writeString("\nKeyboard:");
+            for (key in allControls.get(bind)) {
+                file.writeString(" " + key.toString());
+            }
+            file.writeString("\nGamepad:");
+            for (key in allControls.get(bind)) {
+                file.writeString(" " + key.toString());
+            }
+            file.writeString("\n");
+        }
+        file.close();
+        trace("Controles salvos em: " + filename);
+    }
+
+    public static function loadControls(filename:String):Void {
+        var file = File.read(filename);
+        allControls = new Map<String, Array<Dynamic>>();
+        var bind:String = "";
+        var keyboardKeys:Array<FlxKey> = [];
+        var gamepadKeys:Array<FlxPad> = [];
+        while (!file.eof()) {
+            var line = file.readLine().trim();
+            if (line == "") continue;
+            if (line.indexOf(":") != -1) {
+                if (bind != "") {
+                    allControls.set(bind, [keyboardKeys, gamepadKeys]);
+                    keyboardKeys = [];
+                    gamepadKeys = [];
+                }
+                bind = line.split(":")[0];
+            } else if (line.indexOf("Keyboard:") != -1) {
+                var keys = line.split(":")[1].split(" ");
+                for (key in keys) {
+                    if (key != "") keyboardKeys.push(FlxKey.fromString(key));
+                }
+            } else if (line.indexOf("Gamepad:") != -1) {
+                var keys = line.split(":")[1].split(" ");
+                for (key in keys) {
+                    if (key != "") gamepadKeys.push(FlxPad.fromString(key));
+                }
+            }
+        }
+        if (bind != "") {
+            allControls.set(bind, [keyboardKeys, gamepadKeys]);
+        }
+        file.close();
+        trace("Controles carregados de: " + filename);
+    }
 }

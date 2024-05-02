@@ -8,7 +8,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxTimer;
 import load.LoaderManager;
 import load.hud.Note;
-import load.hud.Strumline;
+import load.hud.StrumNote;
 import haxe.ds.StringMap;
 import hscript.Expr;
 import hscript.Interp;

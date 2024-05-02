@@ -1,6 +1,7 @@
 package data;
 
 import flixel.math.FlxMath;
+import load.Rating;
 
 class Timings
 {
@@ -17,7 +18,8 @@ class Timings
 		[0.35, timingsArray[2][1]], // bad
 		[0.20, timingsArray[3][1]], // shit
 	];
-	
+
+	public static var msThreshold:Float = 0;
 	public static var minTiming:Float = getTimings("miss")[1];
 
 	public static var score:Int = 0;
@@ -78,6 +80,16 @@ class Timings
 		}
 		
 		return daList;
+	}
+
+	public static function judgeNote(arr:Array<Rating>, diff:Float=0):Rating // die
+	{
+		var data:Array<Rating> = arr;
+		for(i in 0...data.length-1) //skips last window (Shit)
+			if (diff <= data[i].hitWindow)
+				return data[i];
+	
+		return data[data.length - 1];
 	}
 
 	public static function updateAccuracy()

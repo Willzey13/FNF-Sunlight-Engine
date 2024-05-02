@@ -12,6 +12,7 @@ import openfl.display.BitmapData;
 import openfl.display3D.textures.Texture;
 import openfl.media.Sound;
 import openfl.system.System;
+import openfl.display3D.textures.RectangleTexture;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 import sys.FileSystem;
@@ -22,6 +23,7 @@ class Paths
 	// Here we set up the paths class. This will be used to
 	// Return the paths of assets and call on those assets as well.
 	inline public static var SOUND_EXT = "ogg";
+	inline public static var VIDEO_EXT = "mp4";
 
 	// level we're loading
 	static var currentLevel:String;
@@ -86,9 +88,55 @@ class Paths
 		System.gc();
 	}
 
+	inline static public function mods(key:String = '') {
+		return 'mods/' + key;
+	}
+
+	inline static public function modsFont(key:String) {
+		return modFolders('fonts/' + key);
+	}
+
+	inline static public function modsJson(key:String) {
+		return modFolders('data/' + key + '.json');
+	}
+
+	inline static public function modsVideo(key:String) {
+		return modFolders('videos/' + key + '.' + VIDEO_EXT);
+	}
+
+	inline static public function modsSounds(path:String, key:String) {
+		return modFolders(path + '/' + key + '.' + SOUND_EXT);
+	}
+
+	inline static public function modsImages(key:String) {
+		return modFolders('images/' + key + '.png');
+	}
+
+	inline static public function modsObjects(key:String) {
+		return modFolders('objects/' + key + '.json');
+	}
+
+	inline static public function modsXml(key:String) {
+		return modFolders('images/' + key + '.xml');
+	}
+
+	inline static public function modsTxt(key:String) {
+		return modFolders('images/' + key + '.txt');
+	}
+
+	static public var currentModDirectory:String = '';
+	static public function modFolders(key:String) {
+		if(currentModDirectory != null && currentModDirectory.length > 0) {
+			var fileToCheck:String = mods(currentModDirectory + '/' + key);
+			if(FileSystem.exists(fileToCheck)) {
+				return fileToCheck;
+			}
+		}
+		return 'mods/' + key;
+	}
+
 	// define the locally tracked assets
 	public static var localTrackedAssets:Array<String> = [];
-
 	public static function clearStoredMemory(?cleanUnused:Bool = false)
 	{
 		// clear anything not in the tracked assets list
@@ -268,10 +316,53 @@ class Paths
 		return inst;
 	}
 
-	inline static public function image(key:String, ?library:String, ?textureCompression:Bool = false)
+	static public function image(key:String, ?library:String = null, ?allowGPU:Bool = true):FlxGraphic 
 	{
-		var returnAsset:FlxGraphic = returnGraphic(key, library, textureCompression);
-		return returnAsset;
+    	var bitmap:BitmapData = null;
+    	var file:String = getPath('images/$key.png', IMAGE, library);
+
+    	if (currentTrackedAssets.exists(file)) {
+        	localTrackedAssets.push(file);
+        	return currentTrackedAssets.get(file);
+    	} else if (OpenFlAssets.exists(file, IMAGE)) {
+        	bitmap = OpenFlAssets.getBitmapData(file);
+    	}
+
+    	if (bitmap != null) {
+        	var retVal = cacheBitmap(file, bitmap, allowGPU);
+        	if(retVal != null) return retVal;
+    	}
+
+    	trace('oh no its returning null NOOOO ($file)');
+    	return null;
+	}
+
+	static public function cacheBitmap(file:String, ?bitmap:BitmapData = null, ?allowGPU:Bool = true) 
+	{
+    	if(bitmap == null) {
+        	if (OpenFlAssets.exists(file, IMAGE)) {
+            	bitmap = OpenFlAssets.getBitmapData(file);
+        	}
+
+        	if(bitmap == null) return null;
+    	}
+
+    	localTrackedAssets.push(file);
+    	if (allowGPU && Saved.data.cacheOnGPU) {
+        	var texture:RectangleTexture = FlxG.stage.context3D.createRectangleTexture(bitmap.width, bitmap.height, BGRA, true);
+        	texture.uploadFromBitmapData(bitmap);
+        	bitmap.image.data = null;
+        	bitmap.dispose();
+        	bitmap.disposeImage();
+        	bitmap = BitmapData.fromTexture(texture);
+    	}
+
+    	var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
+    	newGraphic.persist = true;
+    	newGraphic.destroyOnNoUse = false;
+    	currentTrackedAssets.set(file, newGraphic);
+
+    	return newGraphic;
 	}
 
 	inline static public function font(key:String)
@@ -281,8 +372,8 @@ class Paths
 
 	inline static public function getSparrowAtlas(key:String, ?library:String)
 	{
-		var graphic:FlxGraphic = returnGraphic(key, library);
-		return (FlxAtlasFrames.fromSparrow(graphic, File.getContent(file('images/$key.xml', library))));
+		var graphic:FlxGraphic = image(key, library);
+		return FlxAtlasFrames.fromSparrow(graphic, File.getContent(file('images/$key.xml', library)));
 	}
 
 	inline static public function getPackerAtlas(key:String, ?library:String)
