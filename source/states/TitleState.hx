@@ -35,7 +35,7 @@ class TitleState extends MusicBeatState
 		super.create();
 		Saved.init();
 
-		if(!introEnded)
+		if(!introEnded) 
 		{
 			new FlxTimer().start(0.5, function(tmr:FlxTimer) {
 				Configs.playMusic("freakyMenu");

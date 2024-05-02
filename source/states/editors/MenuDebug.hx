@@ -52,7 +52,7 @@ class MenuDebug extends MusicBeatState
 		if (Controls.justPressed("UI_DOWN"))
 			changeSelection(1);
 
-		if (Controls.justPressed("ACCEPT"))
+		if (Controls.justPressed("ACCEPT")) 
 		{
 			var daSelected:String = "";
 			for (item in newGroup.members) {

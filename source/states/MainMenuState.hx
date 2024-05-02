@@ -171,7 +171,7 @@ class MainMenuState extends MusicBeatState
 				}
 			}
 		}
-
+ 
 		if (debugButton)
 		{
 			selectedOption = true;

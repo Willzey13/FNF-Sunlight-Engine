@@ -10,7 +10,7 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import data.MusicBeatSubstate;
 import ui.Alphabet;
-
+ 
 using StringTools;
 
 class OptionsSubstate extends MusicBeatSubstate

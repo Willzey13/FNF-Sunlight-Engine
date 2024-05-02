@@ -10,7 +10,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import options.object.Checkmark;
 import options.object.Selector;
-import data.MusicBeatState;
+import data.MusicBeatState; 
 import states.MainMenuState;
 import ui.Discord.DiscordClient;
 import data.FNFSprite;

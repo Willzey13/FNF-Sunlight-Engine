@@ -6,7 +6,7 @@ import hxdiscord_rpc.Discord;
 import hxdiscord_rpc.Types;
 
 class DiscordClient
-{
+{ 
 	public static var isInitialized:Bool = false;
 	private static final _defaultID:String = "1218942138449002559";
 	public static var clientID(default, set):String = _defaultID;

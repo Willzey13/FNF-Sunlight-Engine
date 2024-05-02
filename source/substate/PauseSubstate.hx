@@ -129,11 +129,11 @@ class PauseSubstate extends MusicBeatSubstate
 		}
 
 		if (accepted)
-		{
+		{ 
 			var daSelected:String = menuItems[curSelected];
 
 			switch (daSelected)
-			{
+			{ 
 				case "Resume":
 					close();
 				case "Restart Song":
