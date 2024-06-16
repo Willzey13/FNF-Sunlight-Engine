@@ -86,6 +86,19 @@ class FreeplayState extends MusicBeatState
 		mutex = new Mutex();
 		var folderSongs:Array<String> = Paths.returnAssetsLibrary('data', 'assets');
 
+		// addWeek[Songs - NumberWeek - Character] Songs Week FNF
+		addWeek(["tutorial"], 0, ["gf"], FlxColor.fromRGB(222, 7, 54));
+		addWeek(["bopeebo", "fresh", "dad-battle"], 1, ["dad"], FlxColor.fromRGB(158, 0, 142));
+		addWeek(["spookeez", "south", "monster"], 2, ["spooky"], FlxColor.fromRGB(105, 97, 92));
+		addWeek(["pico", "philly-nice", "blammed"], 3, ["pico"], FlxColor.fromRGB(80, 235, 100));
+		addWeek(["satin-panties", "high", "milf"], 4, ["mom"], FlxColor.fromRGB(216, 85, 142));
+		addWeek(["cocoa", "eggnog", "winter-horrorland"], 5, ["parents"], FlxColor.fromRGB(255, 255, 255));
+		addWeek(["senpai", "roses", "thorns"], 6, ["senpai"], FlxColor.fromRGB(245, 159, 83));
+		addWeek(["ugh", "guns", "stress"], 7, ["tankman"], FlxColor.WHITE);
+
+		// addSong[Song - NumberWeek - Character] Others Songs
+		addSong("debuggin",	8, "bf-pixel", FlxColor.fromRGB(7, 211, 222));
+
 		for (i in folderSongs)
 		{
 			if (!existingSongs.contains(i.toLowerCase()))
@@ -96,7 +109,7 @@ class FreeplayState extends MusicBeatState
 				{
 					var castSong:SwagSong = Song.loadFromJson(i, i);
 					icon = (castSong != null) ? castSong.player2 : 'gf';
-					addSong(CoolUtil.spaceToDash(castSong.song), 1, icon, FlxColor.WHITE);
+					//addSong(CoolUtil.spaceToDash(castSong.song), 1, icon, FlxColor.WHITE);
 				}
 			}
 		}
@@ -149,12 +162,12 @@ class FreeplayState extends MusicBeatState
 		//add(selector);
 	}
 
-	public function addSong(songName:String, weekNum:Int, songCharacter:String, songColor:FlxColor)
+	public function addSong(songName:String, weekNum:Int, songCharacter:String, ?songColor:FlxColor)
 	{
 		var coolDifficultyArray = [];
 		for (i in Configs.difficultyArray)
 			if (FileSystem.exists(Paths.songJson(songName, songName + '-' + i))
-				|| (FileSystem.exists(Paths.songJson(songName, songName)) && i == "NORMAL"))
+				|| (FileSystem.exists(Paths.songJson(songName, songName))))
 				coolDifficultyArray.push(i);
 
 		if (coolDifficultyArray.length > 0)
@@ -164,22 +177,22 @@ class FreeplayState extends MusicBeatState
 		}
 	}
 
-	public function addWeek(songs:Array<String>, weekNum:Int, ?songCharacters:Array<String>, ?songColor:Array<FlxColor>)
+	public function addWeek(songs:Array<String>, weekNum:Int, ?songCharacters:Array<String>, ?songColor:FlxColor)
 	{
 		if (songCharacters == null)
 			songCharacters = ['bf'];
 		if (songColor == null)
-			songColor = [FlxColor.WHITE];
+			songColor = FlxColor.WHITE;
 
 		var num:Array<Int> = [0, 0];
 		for (song in songs)
 		{
-			addSong(song, weekNum, songCharacters[num[0]], songColor[num[1]]);
+			addSong(song, weekNum, songCharacters[num[0]], songColor);
 
 			if (songCharacters.length != 1)
 				num[0]++;
-			if (songColor.length != 1)
-				num[1]++;
+			//if (songColor.length != 1)
+				//num[1]++;
 		}
 	}
 
@@ -286,13 +299,9 @@ class FreeplayState extends MusicBeatState
 			if (item.targetY == 0)
 			{
 				item.alpha = 1;
-				item.x = 20 / 2;
 				//item.setGraphicSize(Std.int(item.width));
 			}
 		}
-		//
-
-		//trace("curSelected: " + curSelected);
 
 		changeDiff();
 	}

@@ -312,7 +312,7 @@ class OptionsSubstate extends MusicBeatSubstate
 
 	private function openSubmenu()
 	{
-		offsetTemp = Saved.data.noteOffset;
+		offsetTemp = Saved.gameSettings.get("Note Offset");
 
 		submenu.visible = true;
 		if (curSelection != keyOptions.length - 1)
@@ -381,7 +381,7 @@ class OptionsSubstate extends MusicBeatSubstate
 		{
 			if (FlxG.keys.justPressed.ENTER)
 			{
-				Saved.data.offset = offsetTemp;
+				//Saved.gameSettings.get("Note Offset") = offsetTemp;
 				closeSubmenu();
 			}
 			else if (FlxG.keys.justPressed.ESCAPE)

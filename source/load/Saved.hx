@@ -52,9 +52,7 @@ import options.object.*;
 
 	public var comboOffset:Array<Int> = [0, 0, 0, 0];
 	public var ratingOffset:Int = 0;
-	public var sickWindow:Int = 45;
-	public var goodWindow:Int = 90;
-	public var badWindow:Int = 135;
+
 	public var safeFrames:Float = 10;
 	public var guitarHeroSustains:Bool = true;
 	public var discordRPC:Bool = true;
@@ -69,7 +67,19 @@ class Saved
 	public static var FORCED = 'forced';
 	public static var NOT_FORCED = 'not forced';
 
+	public static var sickWindow:Int = 45;
+	public static var goodWindow:Int = 90;
+	public static var badWindow:Int = 135;
+
 	public static var gameSettings:Map<String, Dynamic> = [
+		'Flashlight' => [
+			true, Checkmark,
+			'Unchecking the option, all Flashlight will be disable', NOT_FORCED
+		],
+		'Cache GPU' => [
+			true, Checkmark,
+			'Unchecking the option, all Flashlight will be disable', NOT_FORCED
+		],
 		'Downscroll' => [
 			false, Checkmark,
 			'Whether to have the strumline vertically flipped in gameplay.', NOT_FORCED
@@ -115,11 +125,6 @@ class Saved
 			Checkmark, 
 			3
 		],
-		"UI Skin" => [
-			'default', Selector,
-			'Choose a UI Skin for judgements, combo, etc.', NOT_FORCED,
-			''
-		],
 		"Note Skin" => [
 			'default', Selector, 
 			'Choose a note skin.', NOT_FORCED, 
@@ -127,37 +132,38 @@ class Saved
 		],
 		"Framerate" => [
 			60, Selector, 
-			'Define your maximum FPS.', NOT_FORCED, 
+			'Define your FPS.', NOT_FORCED, 
+			[]
+		],
+		"Note Offset" => [
+			0, Selector, 
+			'Define your FPS.', NOT_FORCED, 
 			[]
 		],
 		'Ghost Tapping' => [
 			false, Checkmark,
 			"Enables Ghost Tapping, allowing you to press inputs without missing.", NOT_FORCED
 		],
-		'Centered Notefield' => [
+		'Hide HUD' => [
+			false, Checkmark,
+			"Enables Ghost Tapping, allowing you to press inputs without missing.", NOT_FORCED
+		],
+		'Middlescroll' => [
 			false, Checkmark, 
 			"Center the notes, disables the enemy's notes."
+		],//comboStacking
+		'Combo Stacking' => [
+			true, Checkmark, 
+			"Center the notes, disables the enemy's notes."
 		],
-		"Custom Titlescreen" => [
-			false, Checkmark,
-			"Enables the custom Forever Engine titlescreen! (only effective with a restart)", FORCED
-		],
-		'Skip Text' => [
-			'freeplay only', Selector,
-			'Decides whether to skip cutscenes and dialogue in gameplay. May be always, only in freeplay, or never.', NOT_FORCED,
-			['never', 'freeplay only', 'always']
-		],
-		'Fixed Judgements' => [
-			false, Checkmark,
-			"Fixes the judgements to the camera instead of to the world itself, making them easier to read.", NOT_FORCED
-		],
-		'Simply Judgements' => [
-			false, Checkmark,
-			"Simplifies the judgement animations, displaying only one judgement / rating sprite at a time.", NOT_FORCED
+		'Discord RPC' => [
+			true, Checkmark, 
+			"Center the notes, disables the enemy's notes."
 		],
 	];
 
 	public static var data:OptionSaved = {};
+	public static var comboOffset:Array<Int> = [0, 0, 0, 0];
 
 	public static function init()
 	{

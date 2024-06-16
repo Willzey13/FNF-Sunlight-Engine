@@ -112,9 +112,9 @@ class Configs
 		
 		if(!forced)
 		{
-			if(!Saved.data.flashing) return;
+			if(!Saved.gameSettings.get("Flashlight")) return;
 
-			if(Saved.data.flashing)
+			if(Saved.gameSettings.get("Flashlight"))
 				color.alphaFloat = 0.4;
 		}
 		camera.flash(color, duration, null, true);

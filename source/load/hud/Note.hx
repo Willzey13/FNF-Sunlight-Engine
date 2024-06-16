@@ -30,37 +30,6 @@ class Note extends FlxSprite
 	public var noteData:Int = 0;
 	
 	public var noteType:String = "default";
-	public var canBeHit:Bool = false;
-	public var tooLate:Bool = false;
-	public var wasGoodHit:Bool = false;
-	public var prevNote:Note;
-
-	private var willMiss:Bool = false;
-
-	public var altNote:Bool = false;
-	public var gfNote:Bool = false;
-	public var invisNote:Bool = false;
-
-	public var sustainLength:Float = 0;
-	public var isSustain:Bool = false;
-	public var isSustainEnd:Bool = false;
-	public var noteScore:Float = 1;
-
-	public static var swagWidth:Float = 160 * 0.7;
-	public static var PURP_NOTE:Int = 0;
-	public static var GREEN_NOTE:Int = 2;
-	public static var BLUE_NOTE:Int = 1;
-	public static var RED_NOTE:Int = 3;
-	
-	public var noteID:Int = 0;
-	public var missed:Bool = false;
-	public var gotHit:Bool = false;
-	public var gotHeld:Bool = false;
-
-	public var children:Array<Note> = [];
-
-	public var sizeNote:Float = 0;
-	public var strumline:Int = 0;
 	public static var arrowColors:Array<Float> = [1, 1, 1, 1];
 	public var scrollSpeed:Float = Math.NEGATIVE_INFINITY;
 
@@ -90,6 +59,7 @@ class Note extends FlxSprite
 
 	public var notePosition:FlxPoint = new FlxPoint(0,0);
 	public var holdLength:Float = 0;
+	public var sustainHitLength:Float = 0;
 	public var curTextureNote:String = ""; //nothing :)
 	
 	public var rating:String = 'unknown';
@@ -115,30 +85,21 @@ class Note extends FlxSprite
 		switch (curTextureNote)
 		{
 			case "pixel":
-				loadGraphic(Paths.image('hud/notes/pixel/notesPixel'));
-				sizeNote = 6;
-
-				animation.add('greenScroll', [6]);
-				animation.add('redScroll', [7]);
-				animation.add('blueScroll', [5]);
-				animation.add('purpleScroll', [4]);
-
-				if (isSustain)
+				var direction = StrumNote.direction(noteData);
+				if(!isSustain)
 				{
-					loadGraphic(Paths.image('hud/notes/pixel/arrowEnds'), true, 7, 6);
-
-					animation.add('purpleholdend', [4]);
-					animation.add('greenholdend', [6]);
-					animation.add('redholdend', [7]);
-					animation.add('blueholdend', [5]);
-
-					animation.add('purplehold', [0]);
-					animation.add('greenhold', [2]);
-					animation.add('redhold', [3]);
-					animation.add('bluehold', [1]);
+					loadGraphic(Paths.image("hud/notes/pixel/notesPixel"), true, 17, 17);
+					animation.add(direction, [noteData + 4], 0, false);
 				}
-
+				else
+				{
+					loadGraphic(Paths.image("hud/notes/pixel/notesEnds"), true, 7, 6);
+					animation.add(direction, [noteData + (isSustainEnd ? 4 : 0)], 0, false);
+				}
+				animation.play(direction);
+				antialiasing = false;
 				updateHitbox();
+				sizeNote = 6;
 
 			default:
 				frames = Paths.getSparrowAtlas('hud/notes/NOTE_assets');
@@ -228,6 +189,40 @@ class Note extends FlxSprite
 		}
 	}
 
+	public var noteOffset:FlxPoint = new FlxPoint(0,0);
+
+	public var sustainLength:Float = 0;
+	public var isSustain:Bool = false;
+	public var isSustainEnd:Bool = false;
+	public var noteScore:Float = 1;
+
+	public static var swagWidth:Float = 160 * 0.7;
+	public static var PURP_NOTE:Int = 0;
+	public static var GREEN_NOTE:Int = 2;
+	public static var BLUE_NOTE:Int = 1;
+	public static var RED_NOTE:Int = 3;
+	
+	public var noteID:Int = 0;
+	public var missed:Bool = false;
+	public var gotHit:Bool = false;
+	public var gotHeld:Bool = false;
+
+	public var children:Array<Note> = [];
+
+	public var canBeHit:Bool = false;
+	public var tooLate:Bool = false;
+	public var wasGoodHit:Bool = false;
+	public var prevNote:Note;
+
+	private var willMiss:Bool = false;
+
+	public var altNote:Bool = false;
+	public var gfNote:Bool = false;
+	public var invisNote:Bool = false;
+
+	public var sizeNote:Float = 0;
+	public var strumline:Int = 0;
+	
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);

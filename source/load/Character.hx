@@ -108,7 +108,7 @@ class Character extends FlxSprite
 
 	public function dance(forced:Bool = false)
 	{
-		if(specialAnim) return;
+		if (specialAnim) return;
 
 		switch(curChar)
 		{

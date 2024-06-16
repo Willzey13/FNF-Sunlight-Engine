@@ -21,7 +21,7 @@ class Rating
 		var window:String = name + 'Window';
 		try
 		{
-			this.hitWindow = Reflect.field(Saved.data, window);
+			this.hitWindow = Reflect.field(Saved, window);
 		}
 		catch(e) FlxG.log.error(e);
 	}

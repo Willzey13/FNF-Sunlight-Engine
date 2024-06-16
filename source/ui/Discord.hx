@@ -14,13 +14,13 @@ class DiscordClient
 
 	public static function check()
 	{
-		if(Saved.data.discordRpc) initialize();
+		if(Saved.gameSettings.get("Discord RPC")) initialize();
 		else if(isInitialized) shutdown();
 	}
 	
 	public static function prepare()
 	{
-		if (!isInitialized && Saved.data.discordRpc)
+		if (!isInitialized && Saved.gameSettings.get("Discord RPC"))
 			initialize();
 
 		Application.current.window.onClose.add(function() {

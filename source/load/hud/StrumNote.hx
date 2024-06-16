@@ -137,6 +137,7 @@ class NoteStrum extends FlxSprite
 	public var data:Int = 0;
 	public var initialPos:FlxPoint = new FlxPoint(0,0);
 	public var strumAngle:Float = 0;
+	public var sizeNote:Float = 0;
 
 	public function new(data:Int, ?curTexture:String = "base")
 	{
@@ -152,37 +153,14 @@ class NoteStrum extends FlxSprite
 			{
 				case 'pixel':
 					loadGraphic(Paths.image('hud/notes/pixel/notesPixel'), true, 17, 17);
-					animation.add('green', [6]);
-					animation.add('red', [7]);
-					animation.add('blue', [5]);
-					animation.add('purplel', [4]);
+					animation.add("confirm", [data + 12, data + 16], 12, false);
+					animation.add("pressed", [data + 8], 12, false);
+					animation.add("static",  [data], 12, false);
 
-					updateHitbox();
+					animation.play(direction);
 					antialiasing = false;
-
-					switch (Math.abs(i))
-					{
-						case 0:
-							x += Note.swagWidth * 0;
-							animation.add('static', [0]);
-							animation.add('pressed', [4, 8], 12, false);
-							animation.add('confirm', [12, 16], 24, false);
-						case 1:
-							x += Note.swagWidth * 1;
-							animation.add('static', [1]);
-							animation.add('pressed', [5, 9], 12, false);
-							animation.add('confirm', [13, 17], 24, false);
-						case 2:
-							x += Note.swagWidth * 2;
-							animation.add('static', [2]);
-							animation.add('pressed', [6, 10], 12, false);
-							animation.add('confirm', [14, 18], 12, false);
-						case 3:
-							x += Note.swagWidth * 3;
-							animation.add('static', [3]);
-							animation.add('pressed', [7, 11], 12, false);
-							animation.add('confirm', [15, 19], 24, false);
-					}
+					updateHitbox();
+					sizeNote = 6;
 
 				default:
 					frames = Paths.getSparrowAtlas("hud/notes/NOTE_assets");
@@ -238,6 +216,7 @@ class NoteStrum extends FlxSprite
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		scale.set(sizeNote, sizeNote);
 		setOffsetPosition();
 	}
 

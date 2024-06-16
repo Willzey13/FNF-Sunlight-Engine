@@ -30,6 +30,7 @@ class Main extends Sprite
 	public function new()
 	{
 		super();
+		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
 		if (!DiscordClient.isInitialized)
 		{
 			DiscordClient.initialize();
@@ -44,7 +45,6 @@ class Main extends Sprite
 		fpsCount = new FPSCounter(10, 3);
 		addChild(fpsCount);
 
-		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
 		FlxG.fixedTimestep = false;
 		FlxG.mouse.visible = false;
 	}

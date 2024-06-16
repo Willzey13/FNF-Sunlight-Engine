@@ -99,6 +99,7 @@ class TitleState extends MusicBeatState
 				if(!pressedEnter)
 				{
 					pressedEnter = true;
+					FlxG.camera.flash(FlxColor.WHITE, 4);
 					FlxG.sound.play(Paths.sound('confirmMenu'));
 					new FlxTimer().start(2.0, function(tmr:FlxTimer)
 					{

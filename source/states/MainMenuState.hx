@@ -53,7 +53,7 @@ class MainMenuState extends MusicBeatState
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
 		bg.screenCenter();
-		bg.antialiasing = Saved.data.antialiasing;
+		bg.antialiasing = Saved.gameSettings.get("Antialiasing");
 		add(bg);
 
 		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menu/mainmenu/menuDesat'));
@@ -62,7 +62,7 @@ class MainMenuState extends MusicBeatState
 		magenta.updateHitbox();
 		magenta.screenCenter();
 		magenta.visible = false;
-		magenta.antialiasing = Saved.data.antialiasing;
+		magenta.antialiasing = Saved.gameSettings.get("Antialiasing");
 		magenta.color = 0xFFfd719b;
 		add(magenta);
 		
@@ -95,7 +95,7 @@ class MainMenuState extends MusicBeatState
 			var scr:Float = (optionShit.length - 4) * 0.135;
 			if(optionShit.length < 6) scr = 0;
 			item.scrollFactor.set(0, scr);
-			item.antialiasing = Saved.data.antialiasing;
+			item.antialiasing = Saved.gameSettings.get("Antialiasing");
 			//item.setGraphicSize(Std.int(item.width * 0.58));
 			item.updateHitbox();
 		}
@@ -154,18 +154,37 @@ class MainMenuState extends MusicBeatState
 					selectedOption = true;
 					FlxG.sound.play(Paths.sound('confirmMenu'));
 					
-					FlxFlicker.flicker(magenta, 1.1, 0.15, false);
-					
-					new FlxTimer().start(1.5, function(tmr:FlxTimer)
+					if (Saved.gameSettings.get("Flashlight")) FlxFlicker.flicker(magenta, 1.1, 0.15, false);
+
+					menuItems.forEach(function(spr:FlxSprite)
 					{
-						switch(optionShit[curSelected])
+						if (curSelected != spr.ID)
 						{
-							case "story_mode":
-								MusicBeatState.switchState(new PlayState());
-							case "options":
-								MusicBeatState.switchState(new OptionsState());
-							case 'freeplay':
-								MusicBeatState.switchState(new FreeplayState());
+							FlxTween.tween(spr, {alpha: 0}, 0.4, {
+								ease: FlxEase.quadOut,
+								onComplete: function(twn:FlxTween)
+								{
+									spr.kill();
+								}
+							});
+						}
+						else
+						{
+					
+							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
+							{
+								var daChoice:String = optionShit[curSelected];
+
+								switch(daChoice)
+								{
+									case "story_mode":
+										MusicBeatState.switchState(new PlayState());
+									case "options":
+										MusicBeatState.switchState(new OptionsState());
+									case 'freeplay':
+										MusicBeatState.switchState(new FreeplayState());
+								}
+							});
 						}
 					});
 				}

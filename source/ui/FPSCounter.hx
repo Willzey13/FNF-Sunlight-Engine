@@ -61,7 +61,7 @@ class FPSCounter extends TextField
 		if (visible)
 		{
 			text = ''
-				+ (displayFps ? (times.length > Saved.data.framerate ? Saved.data.framerate : times.length)
+				+ (displayFps ? (times.length > Saved.gameSettings.get("Framerate") ? Saved.gameSettings.get("Framerate") : times.length)
 					+ " FPS\n" : '')
 			+ (displayMemory ? '${getInterval(mem)} / ${getInterval(memPeak)}\n' : ''); // Current and Total Memory Usage
 		}
